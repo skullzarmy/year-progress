@@ -1,10 +1,9 @@
-/* MASSIVE REWORK */
-
 @font-face {
   font-family: 'DSEG7 Classic';
   src: url('./fonts/DSEG7Classic-Regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -12,6 +11,7 @@
   src: url('./fonts/DSEG14Classic-Regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 :root {
@@ -211,8 +211,11 @@ h1 {
 }
 
 .progress-bar-fill {
-  height: 100%; width: 0%; background: var(--bar-fill);
-  border-radius: 999px; position: relative; z-index: 2; transition: width 0.1s linear;
+  height: 100%; width: 100%; 
+  background: var(--bar-fill);
+  border-radius: 999px; position: relative; z-index: 2; 
+  clip-path: inset(0 100% 0 0);
+  will-change: clip-path;
 }
 
 .stats {
@@ -224,6 +227,7 @@ h1 {
   font-weight: 600; color: var(--text-main);
 }
 .details { font-size: 1.1rem; color: var(--text-muted); font-weight: 500; }
+
 footer {
   display: flex;
   justify-content: space-between;
@@ -270,19 +274,25 @@ footer a:hover {
 
 [data-theme="glassmorphism"] .glass-layer { opacity: 1; }
 
-/* The background canvas: A vivid sweeping gradient to ensure no "grey" dead zones */
+/* The background canvas: A vivid sweeping gradient using transform */
 [data-theme="glassmorphism"] .mesh-gradient {
   position: absolute; inset: 0;
-  background: linear-gradient(45deg, #00f2fe, #4facfe, #ff0844, #ffb199);
-  background-size: 400% 400%;
-  animation: bgGradient 15s ease infinite;
+  overflow: hidden;
   z-index: 0;
+}
+[data-theme="glassmorphism"] .mesh-gradient::before {
+  content: "";
+  position: absolute;
+  top: -50%; left: -50%; width: 200%; height: 200%;
+  background: linear-gradient(45deg, #00f2fe, #4facfe, #ff0844, #ffb199);
+  background-size: 100% 100%;
+  animation: bgGradient 15s ease-in-out infinite alternate;
 }
 
 @keyframes bgGradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(-20%, -10%); }
+  100% { transform: translate(10%, -20%); }
 }
 
 /* Vivid fluid blobs floating behind the glass */

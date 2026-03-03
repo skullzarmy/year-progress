@@ -146,7 +146,7 @@ function update(time: number) {
   // Throttle updates slightly to 30fps to avoid excessive DOM writes 
   // and make animations smoother/less visually taxing.
   if (time - lastTickTime > 33) {
-    progressFill.style.width = percentString;
+    progressFill.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
     
     if (currentTheme === 'terminal') {
        // A clean text block representation that doesn't trigger seizure/motion issues
