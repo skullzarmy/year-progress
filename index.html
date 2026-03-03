@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="glassmorphism">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Year Progress</title>
+    <!-- Fonts: Inter (Standard), Space Mono (Terminal), MS Sans Serif/Tahoma vibe for Vaporwave (Win95), DSEG (80s Digital) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dseg@0.46.0/css/dseg.css">
+  </head>
+  <body>
+    <!-- Theme Transition Overlay -->
+    <div id="transition-overlay" class="hidden" aria-hidden="true" data-next-theme="">
+      <div id="transition-content"></div>
+    </div>
+
+    <!-- Background Decorators, simplified for clean CSS hooks -->
+    <div id="decorators" aria-hidden="true">
+      <div class="theme-layer glass-layer">
+        <div class="mesh-gradient"></div>
+        <div class="glass-blob blob-1"></div>
+        <div class="glass-blob blob-2"></div>
+        <div class="glass-blob blob-3"></div>
+      </div>
+      <div class="theme-layer vapor-layer">
+        <div class="vapor-sky"></div>
+        <div class="vapor-grid-perspective">
+          <div class="vapor-grid"></div>
+        </div>
+        <!-- Decorative surrealist elements for Vaporwave via CSS -->
+        <div class="vapor-window-bg"></div>
+      </div>
+      <div class="theme-layer cyb-layer">
+        <div class="cyb-concrete-bg"></div>
+        <div class="cyb-neon-grid"></div>
+        <div class="cyb-hologram-ad" aria-hidden="true">ネオン // CYBERNETICS // 電界</div>
+        <div class="cyb-scanlines"></div>
+      </div>
+      <!-- Terminal has no complex background layer -->
+    </div>
+
+    <!-- Main App UI -->
+    <div id="app">
+      <header>
+        <div class="theme-picker-container">
+          <label for="theme-select" class="visually-hidden">Choose a visual theme</label>
+          <select id="theme-select">
+            <option value="glassmorphism">glassmorphism</option>
+            <option value="vaporwave">vaporwave</option>
+            <option value="80s-digital">80s-digital</option>
+            <option value="cyberpunk">cyberpunk</option>
+            <option value="terminal">terminal</option>
+          </select>
+        </div>
+      </header>
+
+      <main class="progress-main" id="main-ui">
+        <div class="card-container">
+          <div class="glass-card">
+            <!-- Vaporwave Win95 Title Bar (hidden in other themes) -->
+            <div class="vapor-titlebar hidden" aria-hidden="true">
+              <span class="titlebar-text">YEAR_PROGRESS.EXE</span>
+              <div class="titlebar-controls">
+                <button class="win95-btn">_</button>
+                <button class="win95-btn">□</button>
+                <button class="win95-btn">×</button>
+              </div>
+            </div>
+            
+            <h1 id="year-title">YEAR PROGRESS</h1>
+            
+            <div class="progress-wrapper">
+              <div class="progress-bar-background" aria-hidden="true">
+                <div id="progress-fill" class="progress-bar-fill"></div>
+              </div>
+              <progress id="semantic-progress" value="0" max="100" class="visually-hidden">0%</progress>
+            </div>
+            
+            <div class="stats" aria-live="polite">
+              <div class="percentage-wrapper">
+                <span id="term-prefix" class="hidden" aria-hidden="true">&gt; </span>
+                <span id="percentage-text" class="percentage">0.000000%</span>
+                <span id="term-cursor" class="hidden" aria-hidden="true">_</span>
+              </div>
+              <div class="details">
+                <span id="days-remaining">Calculating...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <p id="footer-text">"Lost time is never found again." &mdash; Benjamin Franklin</p>
+        <p id="creator-text">created by <a href="https://joepeterson.work" target="_blank" rel="noopener noreferrer">Joe Peterson</a></p>
+      </footer>
+    </div>
+    
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

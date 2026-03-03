@@ -1,0 +1,829 @@
+/* MASSIVE REWORK */
+
+@font-face {
+  font-family: 'DSEG7 Classic';
+  src: url('./fonts/DSEG7Classic-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DSEG14 Classic';
+  src: url('./fonts/DSEG14Classic-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  /* Default: Glassmorphism (Vision OS style) */
+  --font-base: 'Inter', system-ui, sans-serif;
+  --bg-color: #f4f4f5; /* Zinc 100 */
+  --text-main: #18181b; /* Zinc 900 */
+  --text-muted: #52525b; /* Zinc 600 */
+  
+  --card-bg: rgba(255, 255, 255, 0.65);
+  --card-border: rgba(255, 255, 255, 0.4);
+  --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  --card-backdrop: blur(40px) saturate(150%);
+  
+  --bar-bg: #e4e4e7; /* Zinc 200 */
+  --bar-border: rgba(255,255,255, 0.5);
+  --bar-fill: linear-gradient(90deg, #3b82f6, #ec4899); /* WCAG AAA Blue to Pink against Zinc 200/900 is somewhat tricky, we use high contrast values */
+  --title-color: #18181b;
+  --accent-color: #3b82f6;
+  --selection-bg: rgba(59, 130, 246, 0.2);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-base);
+  transition: background-color 0.5s ease, color 0.5s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--selection-bg);
+}
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.hidden { display: none !important; }
+
+/* ========================================================================= */
+/* THEME TRANSITION OVERLAY */
+/* ========================================================================= */
+#transition-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  pointer-events: none;
+}
+#transition-overlay.active {
+  opacity: 1; visibility: visible;
+}
+#transition-content {
+  font-size: clamp(1.2rem, 3vw, 2.5rem); text-align: center; padding: 2rem;
+}
+
+/* Glassmorphism Transition */
+#transition-overlay[data-next-theme="glassmorphism"] {
+  background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(40px) saturate(150%); -webkit-backdrop-filter: blur(40px) saturate(150%);
+}
+
+/* Vaporwave Transition */
+#transition-overlay[data-next-theme="vaporwave"] {
+  background: #0000aa; color: #fff; font-family: 'Tahoma', sans-serif;
+}
+#transition-overlay[data-next-theme="vaporwave"] #transition-content::after {
+  content: "Applying system settings... Please wait."; font-weight: bold;
+}
+
+/* 80s Digital Transition */
+#transition-overlay[data-next-theme="80s-digital"] {
+  background: #0a0000; color: #ff0000; font-family: 'DSEG14 Classic', monospace;
+  text-shadow: 0 0 15px rgba(255,0,0,0.8);
+}
+#transition-overlay[data-next-theme="80s-digital"] #transition-content::after {
+  content: "CALIBRATING...";
+}
+
+/* Cyberpunk Transition */
+#transition-overlay[data-next-theme="cyberpunk"] {
+  background: #020205; color: #fcee0a; font-family: 'Space Mono', monospace;
+}
+#transition-overlay[data-next-theme="cyberpunk"] #transition-content::after {
+  content: "NEURO-LINK ESTABLISHING..."; font-weight: 800;
+  text-shadow: 3px 0 0 rgba(0,240,255,0.9), -3px 0 0 rgba(255,0,60,0.9);
+  animation: glitch-overlay 0.2s infinite;
+}
+@keyframes glitch-overlay {
+  0% { transform: translate(2px, 2px); }
+  50% { transform: translate(-2px, -2px); }
+  100% { transform: translate(2px, -2px); }
+}
+
+/* Terminal Transition */
+#transition-overlay[data-next-theme="terminal"] {
+  background: #000; color: #4ade80; font-family: 'Space Mono', monospace; font-weight: 700;
+}
+#transition-overlay[data-next-theme="terminal"] #transition-content::after {
+  content: "root@system:~# reboot█";
+  animation: blink-overlay 1s step-end infinite;
+}
+@keyframes blink-overlay { 50% { opacity: 0; } }
+
+/* Decorator Base */
+#decorators {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0; /* Changed from -1 to 0 to prevent WebKit body background occlusion */
+}
+
+.theme-layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden; /* Prevent completely hidden layers from rendering/bleeding */
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+  overflow: hidden;
+}
+
+[data-theme="glassmorphism"] .glass-layer,
+[data-theme="vaporwave"] .vapor-layer,
+[data-theme="cyberpunk"] .cyb-layer {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* App Layout */
+#app {
+  display: flex; flex-direction: column; min-height: 100vh;
+  padding: 2rem; max-width: 1200px; margin: 0 auto;
+  position: relative; z-index: 10;
+}
+
+header { display: flex; justify-content: flex-end; z-index: 20; position: relative; margin-bottom: 2rem; }
+
+/* select styles */
+select {
+  appearance: none; background-color: var(--card-bg);
+  border: 1px solid var(--card-border); color: var(--text-main);
+  padding: 0.6rem 2.2rem 0.6rem 1rem; border-radius: 8px;
+  font-family: inherit; font-size: 0.95rem; font-weight: 500; cursor: pointer;
+  backdrop-filter: var(--card-backdrop); -webkit-backdrop-filter: var(--card-backdrop);
+  outline: none; transition: all 0.2s ease;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat; background-position: right 0.8rem center; background-size: 1em;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+select:focus-visible {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+select option { background-color: var(--bg-color); color: var(--text-main); }
+
+main.progress-main {
+  flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
+  width: 100%; max-width: 800px; margin: 0 auto;
+}
+
+.card-container { width: 100%; }
+
+.glass-card {
+  position: relative;
+  background: var(--card-bg);
+  backdrop-filter: var(--card-backdrop);
+  -webkit-backdrop-filter: var(--card-backdrop);
+  border: 1px solid var(--card-border);
+  border-radius: 24px;
+  padding: 4rem;
+  box-shadow: var(--card-shadow);
+  transition: all 0.5s ease;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; margin-bottom: 3rem;
+  letter-spacing: -0.04em; text-align: center;
+  color: var(--title-color);
+}
+
+.progress-wrapper { width: 100%; margin-bottom: 2.5rem; }
+
+.progress-bar-background {
+  width: 100%; height: 28px; background: var(--bar-bg);
+  border-radius: 999px; border: 1px solid var(--bar-border);
+  overflow: hidden; position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%; width: 0%; background: var(--bar-fill);
+  border-radius: 999px; position: relative; z-index: 2; transition: width 0.1s linear;
+}
+
+.stats {
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+}
+.percentage-wrapper { display: flex; align-items: center; gap: 0.5rem; }
+.percentage {
+  font-size: clamp(2rem, 4vw, 3rem); font-variant-numeric: tabular-nums;
+  font-weight: 600; color: var(--text-main);
+}
+.details { font-size: 1.1rem; color: var(--text-muted); font-weight: 500; }
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding-top: 2rem;
+  font-weight: 500;
+}
+footer p {
+  margin: 0;
+}
+footer a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+}
+footer a:hover {
+  color: var(--text-main);
+}
+
+/* ========================================================================= */
+/* THEME: GLASSMORPHISM (Frosted Glass, Fluid Gradients, Depth) */
+/* ========================================================================= */
+[data-theme="glassmorphism"] {
+  --font-base: 'Inter', system-ui, sans-serif;
+  --bg-color: #ffffff; /* Fallback */
+  --text-main: #000000; /* Pure black text for crisp contrast against frosted glass */
+  --text-muted: #1e293b; /* Very dark blue/grey for secondary text */
+  --card-bg: rgba(255, 255, 255, 0.4); /* Medium white frost to balance vivid background without hiding it */
+  --card-border: rgba(255, 255, 255, 0.6); /* Crisp visible light border */
+  --card-shadow: 0 30px 60px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8); /* Soft shadow + top highlight */
+  --bar-bg: rgba(255, 255, 255, 0.35); /* Frost inset for progress bar */
+  --bar-border: rgba(255, 255, 255, 0.6);
+  --bar-fill: linear-gradient(90deg, #ff0844, #ffb199); /* Vivid bright fill */
+  --title-color: #000000;
+  --accent-color: #00f2fe;
+  --selection-bg: rgba(0, 242, 254, 0.3);
+  --card-backdrop: blur(32px) saturate(130%);
+}
+
+[data-theme="glassmorphism"] .glass-layer { opacity: 1; }
+
+/* The background canvas: A vivid sweeping gradient to ensure no "grey" dead zones */
+[data-theme="glassmorphism"] .mesh-gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(45deg, #00f2fe, #4facfe, #ff0844, #ffb199);
+  background-size: 400% 400%;
+  animation: bgGradient 15s ease infinite;
+  z-index: 0;
+}
+
+@keyframes bgGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Vivid fluid blobs floating behind the glass */
+[data-theme="glassmorphism"] .glass-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px); /* Beautiful fluid bleed */
+  z-index: 1;
+  opacity: 0.85;
+  animation: floatBlobs 12s infinite alternate ease-in-out;
+}
+
+[data-theme="glassmorphism"] .blob-1 {
+  top: 10%; left: 10%;
+  width: 50vw; height: 50vh;
+  background: #ffea00; /* Vivid bright yellow to pop against the base */
+  animation-delay: 0s;
+}
+
+[data-theme="glassmorphism"] .blob-2 {
+  bottom: 10%; right: 10%;
+  width: 60vw; height: 60vh;
+  background: #00f2fe; /* Vivid Cyan */
+  animation-delay: -4s;
+}
+
+[data-theme="glassmorphism"] .blob-3 {
+  top: 40%; left: 40%;
+  width: 50vw; height: 50vh;
+  background: #ff0844; /* Vivid Hot Pink */
+  animation-delay: -8s;
+}
+
+@keyframes floatBlobs {
+  0% { transform: translate(0%, 0%) scale(1); }
+  50% { transform: translate(4%, 6%) scale(1.05); }
+  100% { transform: translate(-4%, -6%) scale(0.95); }
+}
+
+[data-theme="glassmorphism"] h1 {
+  font-weight: 800; letter-spacing: -0.02em;
+  color: var(--title-color);
+  background: none;
+  -webkit-text-fill-color: initial;
+}
+
+
+/* ========================================================================= */
+/* THEME: VAPORWAVE (Windows 95, Mallsoft, Surrealism) */
+/* ========================================================================= */
+[data-theme="vaporwave"] {
+  /* Tahoma / MS Sans Serif style font */
+  --font-base: 'Tahoma', 'Verdana', 'Segoe UI', sans-serif;
+  --bg-color: #ff99cc; /* Soft vaporwave pink base */
+  --text-main: #000000; /* Pure black for W95 UI text, ultimate contrast */
+  --text-muted: #404040;
+  --card-bg: #c0c0c0; /* Standard W95 Grey */
+  --card-border: #ffffff; 
+  /* W95 3D Border Effect */
+  --card-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #0a0a0a, inset 2px 2px #fff, inset -2px -2px #808080, 2px 2px 0px rgba(0,0,0,1);
+  --bar-bg: #ffffff; /* White inset for progress bar */
+  --bar-border: #808080;
+  --bar-fill: linear-gradient(90deg, #008080 0%, #00ffff 100%); /* Teal to cyan filling */
+  --title-color: #000080; /* W95 Dark Blue for active titles */
+  --accent-color: #ff00ff; /* Bright Magenta */
+  --selection-bg: #000080;
+}
+
+[data-theme="vaporwave"] .vapor-layer { opacity: 1; }
+
+/* The Sky (Sunset Gradient) */
+[data-theme="vaporwave"] .vapor-sky {
+  position: absolute; inset: 0 0 50% 0; /* Top half */
+  background: linear-gradient(to bottom, #000033 0%, #660066 40%, #ff3399 80%, #ff99cc 100%);
+  z-index: 10;
+}
+
+/* The Floor (Checkered Perspective Grid) */
+[data-theme="vaporwave"] .vapor-grid-perspective {
+  position: absolute; inset: 50% 0 0 0; /* Bottom half */
+  perspective: 600px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+[data-theme="vaporwave"] .vapor-grid {
+  position: absolute;
+  top: 0; left: -50%; right: -50%; bottom: -50%;
+  background-image: 
+    linear-gradient(#00ffff 2px, transparent 2px),
+    linear-gradient(90deg, #00ffff 2px, transparent 2px);
+  background-size: 40px 40px;
+  background-position: center top;
+  transform: rotateX(60deg);
+  transform-origin: top center;
+  /* Add magenta glow behind grid */
+  box-shadow: inset 0px 30px 50px rgba(255, 0, 255, 0.4);
+}
+
+/* Windows 95 Window Styling replacing the glass card */
+[data-theme="vaporwave"] .glass-card {
+  border-radius: 0;
+  border: 1px solid var(--text-main);
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  padding: 2px; /* W95 border padding */
+}
+
+/* W95 Title Bar */
+[data-theme="vaporwave"] .vapor-titlebar {
+  background: linear-gradient(90deg, #000080, #1084d0); /* W95 Active Title Bar Gradient */
+  color: #ffffff;
+  padding: 3px 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 0.85rem;
+  margin-bottom: 2rem;
+}
+
+[data-theme="vaporwave"] .titlebar-controls {
+  display: flex; gap: 2px;
+}
+
+[data-theme="vaporwave"] .win95-btn {
+  background: #c0c0c0;
+  border: none;
+  box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #0a0a0a, inset 2px 2px #fff, inset -2px -2px #808080;
+  color: #000;
+  font-weight: bold;
+  height: 20px; width: 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem;
+  padding: 0;
+  cursor: pointer;
+}
+[data-theme="vaporwave"] .win95-btn:active {
+  box-shadow: inset -1px -1px #dfdfdf, inset 1px 1px #0a0a0a, inset -2px -2px #fff, inset 2px 2px #808080;
+}
+
+[data-theme="vaporwave"] .progress-main {
+  padding: 0 1rem; /* Adjust padding for W95 window inner content */
+}
+
+[data-theme="vaporwave"] h1 {
+  /* Japanese Typography Injection */
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #ff00ff;
+  text-shadow: 2px 2px 0px #00ffff, -1px -1px 0px #000;
+  margin-top: 0; margin-bottom: 1.5rem;
+}
+
+[data-theme="vaporwave"] .percentage {
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: bold;
+  color: #00ffff;
+  text-shadow: 3px 3px 0px #ff00ff, 1px 1px 0px #000;
+}
+
+[data-theme="vaporwave"] .progress-bar-background {
+  border-radius: 0;
+  background: var(--bar-bg);
+  /* W95 Inset Sunken Border */
+  box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf;
+  border: none;
+  height: 28px;
+  padding: 2px;
+}
+
+[data-theme="vaporwave"] .progress-bar-fill {
+  border-radius: 0;
+  background: var(--bar-fill);
+}
+
+[data-theme="vaporwave"] select {
+  font-family: inherit;
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #0a0a0a;
+  box-shadow: inset 1px 1px #808080, inset -1px -1px #dfdfdf;
+  border-radius: 0;
+  font-weight: 400;
+  /* Custom W95 dropdown arrow */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M4 6h8l-4 5z'/%3e%3csvg%3e");
+  background-size: 16px;
+  background-color: #c0c0c0; /* Match Grey button background */
+  padding-right: 20px;
+}
+
+
+/* ========================================================================= */
+/* THEME: 80s DIGITAL (7-Segment LED Clock) */
+/* ========================================================================= */
+[data-theme="80s-digital"] {
+  /* Use DSEG14 Classic for 14-segment alphabetical body text, simulating a full electronic display board */
+  --font-base: 'DSEG14 Classic', monospace;
+  --bg-color: #0d0000; /* Slightly lighter deep red/black for better contrast baseline */
+  --text-main: #ff3333; /* Brighter, high-contrast LED Red (easily passes against #0d0000) */
+  --text-muted: #801a1a; /* Much lighter "off-state" LED red to ensure WCAG 2.2 AA (4.5:1) against #0d0000 */
+  --card-bg: #0a0000; 
+  --card-border: #1a0000; 
+  --card-shadow: inset 0 0 50px rgba(0,0,0,1), 0 10px 30px rgba(0,0,0,0.8);
+  --bar-bg: #1a0000; 
+  --bar-border: #330000;
+  --bar-fill: #ff3333; /* Solid LED Red */
+  --title-color: #ff3333;
+  --accent-color: #ff3333;
+  --selection-bg: rgba(255, 51, 51, 0.3);
+}
+
+[data-theme="80s-digital"] .cyb-layer { opacity: 1; }
+[data-theme="80s-digital"] select { 
+  color: var(--text-main); 
+  background-color: #0a0000;
+  border: 2px solid #330000;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
+  text-transform: uppercase;
+  font-family: 'DSEG14 Classic', monospace; 
+  font-weight: 400;
+  border-radius: 4px;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff0000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); 
+}
+
+/* Isolate to 80s-digital */
+[data-theme="80s-digital"] .cyb-bg {
+  position: absolute; inset: 0; 
+  background-color: var(--bg-color);
+  background-image: radial-gradient(circle at center, rgba(255,0,0,0.05) 0%, transparent 70%);
+}
+
+[data-theme="80s-digital"] .cyb-scanlines {
+  position: absolute; inset: 0;
+  /* subtle plastic texture instead of scanlines */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 50;
+}
+
+[data-theme="80s-digital"] .glass-card {
+  border-radius: 16px;
+  border: 8px solid #111; /* Thick plastic bezel */
+  border-bottom-width: 16px;
+  box-shadow: var(--card-shadow), 0 0 0 2px #000;
+  background: var(--card-bg);
+  /* Inner shadow for inset digital display */
+  position: relative;
+  padding: 3rem;
+}
+
+[data-theme="80s-digital"] h1 {
+  font-weight: 400; 
+  font-family: 'DSEG14 Classic', monospace; 
+  text-transform: uppercase; 
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 10px rgba(255,0,0,0.6), 0 0 20px rgba(255,0,0,0.4);
+  margin-top: 0;
+  margin-bottom: 2.5rem;
+}
+
+[data-theme="80s-digital"] .progress-bar-background { 
+  border-radius: 4px; 
+  border: none; 
+  background: var(--bar-bg); 
+  height: 36px;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);
+  /* The "off" LED segments in the background */
+  background-image: repeating-linear-gradient(90deg, transparent, transparent 8px, #0a0000 8px, #0a0000 12px);
+}
+
+[data-theme="80s-digital"] .progress-bar-fill { 
+  border-radius: 2px; 
+  /* Glowing Red LED segments */
+  text-shadow: 0 0 10px rgba(255,0,0,0.8);
+  box-shadow: 0 0 15px rgba(255,0,0,0.6);
+  /* Segment dividers matching the background */
+  mask-image: repeating-linear-gradient(90deg, black, black 8px, transparent 8px, transparent 12px);
+  -webkit-mask-image: repeating-linear-gradient(90deg, black, black 8px, transparent 8px, transparent 12px);
+}
+
+/* Base glowing LED styles for text */
+[data-theme="80s-digital"] .percentage {
+  font-family: 'DSEG7 Classic', monospace; /* Force 7-segment strictly on the numbers */
+  text-shadow: 0 0 15px rgba(255,0,0,0.8);
+  font-size: clamp(2rem, 4vw, 3.5rem); /* Subtly smaller for 80s clock text */
+  letter-spacing: 2px;
+}
+[data-theme="80s-digital"] .details {
+  text-shadow: 0 0 15px rgba(255,0,0,0.8);
+  font-family: 'DSEG14 Classic', monospace;
+  margin-top: 1rem;
+}
+
+
+/* ========================================================================= */
+/* THEME: CYBERPUNK (Neon Noir, Brutalism, Scavenged Tech) */
+/* ========================================================================= */
+[data-theme="cyberpunk"] {
+  --font-base: 'Space Mono', monospace;
+  --bg-color: #020205; /* Pitch black / dark noir */
+  --text-main: #fcee0a; /* Cyberpunk Yellow for high contrast */
+  --text-muted: #00f0ff; /* Electric Cyan */
+  --card-bg: #111116; /* Dark oppressive concrete grey */
+  --card-border: #ff003c; /* Harsh Neon Red/Pink */
+  --card-shadow: 10px 10px 0px rgba(255, 0, 60, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.8);
+  --bar-bg: #050505; /* Black inset */
+  --bar-border: #333333; /* Industrial dark metal border */
+  --bar-fill: repeating-linear-gradient(45deg, #00f0ff, #00f0ff 10px, #008b99 10px, #008b99 20px); /* Cyan caution tape */
+  --title-color: #ffffff; /* Stark white for pure WCAG 2.2 AAA against dark grey */
+  --accent-color: #00f0ff;
+  --selection-bg: rgba(252, 238, 10, 0.4);
+}
+
+/* (Visibility handled in base .theme-layer block) */
+
+/* Brutalist select menu resembling hazard signage */
+[data-theme="cyberpunk"] select { 
+  color: #050505; 
+  background-color: var(--text-main); /* Yellow background with black text for warning sign aesthetic */
+  border: 2px solid #000;
+  box-shadow: 4px 4px 0px var(--card-border);
+  text-transform: uppercase;
+  font-weight: 800;
+  border-radius: 0;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23050505' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); 
+}
+
+/* Concrete Brutalist Background and Noir Lighting */
+[data-theme="cyberpunk"] .cyb-concrete-bg {
+  position: absolute; inset: 0; 
+  background-color: var(--bg-color);
+  background-image: 
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E"),
+    linear-gradient(to bottom, transparent 80%, rgba(255, 0, 60, 0.1) 100%); /* Red city underglow */
+  z-index: 1;
+}
+
+/* Neon Street Grid Reflecting Noir Light */
+[data-theme="cyberpunk"] .cyb-neon-grid {
+  position: absolute; bottom: 0; left: -50%; right: -50%; height: 40vh;
+  background-image: 
+    linear-gradient(rgba(0, 240, 255, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.15) 1px, transparent 1px);
+  background-size: 30px 30px;
+  transform: perspective(400px) rotateX(70deg);
+  transform-origin: top center;
+  z-index: 2;
+  box-shadow: inset 0 50px 50px var(--bg-color); /* Fades into darkness */
+}
+
+/* Giant Holographic Commercial Ad */
+[data-theme="cyberpunk"] .cyb-hologram-ad {
+  position: absolute; top: 10%; left: 0; width: 100%;
+  font-family: 'Inter', sans-serif; /* Standard clean corporate font */
+  font-weight: 900; font-size: clamp(6rem, 15vw, 15rem);
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(252, 238, 10, 0.2); /* Faint glowing outline */
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 3;
+  transform: scaleY(1.5); /* Tall stretched corp text */
+  text-shadow: 0 0 20px rgba(252, 238, 10, 0.05); /* Faint ambient glow */
+  animation: glitch-anim-hologram 6s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-hologram {
+  0% { transform: scaleY(1.5) translate(0, 0); opacity: 0.8;}
+  20% { opacity: 0.3; }
+  21% { opacity: 0.8; }
+  50% { transform: scaleY(1.6) translate(-5px, 0); opacity: 0.9;}
+  80% { opacity: 1; }
+  100% { transform: scaleY(1.5) translate(2px, 2px); opacity: 0.7;}
+}
+
+/* Heavy CRT Scanlines and Screen Curvature representing Scavenged Tech */
+[data-theme="cyberpunk"] .cyb-scanlines {
+  position: absolute; inset: 0;
+  background-image: 
+    linear-gradient(transparent 50%, rgba(0,0,0,0.5) 50%),
+    linear-gradient(90deg, rgba(255,0,0,0.04), rgba(0,255,0,0.02), rgba(0,0,255,0.04));
+  background-size: 100% 4px, 4px 100%;
+  pointer-events: none;
+  z-index: 50; /* Topmost overlay for the whole app */
+  /* Adds a slight dark vignette */
+  box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+}
+
+/* Brutalist UI Box (Scavenged/Duct Taped look) */
+[data-theme="cyberpunk"] .glass-card {
+  border-radius: 0;
+  border: 4px solid #333; /* Dark industrial frame */
+  border-left: 4px solid var(--card-border); /* Neon red accent */
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  /* Scavenged angular cutouts */
+  clip-path: polygon(0 0, calc(100% - 40px) 0, 100% 40px, 100% 100%, 40px 100%, 0 calc(100% - 40px));
+  position: relative;
+  padding: 4rem;
+  /* Subtle concrete noise inside the card */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* Scavenged Tech / Duct Tape Visual (Greebling) */
+[data-theme="cyberpunk"] .glass-card::before {
+  content: "";
+  position: absolute;
+  top: -10px; left: 20%;
+  width: 80px; height: 35px;
+  background-color: #555; /* Grey duct tape */
+  transform: rotate(-3deg);
+  opacity: 0.9;
+  box-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+  /* Tape texture lines */
+  background-image: repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px);
+}
+[data-theme="cyberpunk"] .glass-card::after {
+  content: "DANGER // HI-VOLT //";
+  position: absolute;
+  top: 15px; right: 15px;
+  font-size: 0.65rem;
+  font-weight: bold;
+  color: #000;
+  background: var(--text-main); /* Yellow hazard tape */
+  padding: 2px 5px;
+  letter-spacing: 0.1em;
+  transform: rotate(2deg);
+  box-shadow: 2px 2px 0 #000;
+}
+
+[data-theme="cyberpunk"] h1 {
+  font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--title-color);
+  /* Intense Chromatic Aberration / Glitch Text */
+  text-shadow: 
+    3px 0 0 rgba(0,240,255,0.9), 
+    -3px 0 0 rgba(255,0,60,0.9),
+    0 0 10px rgba(255,0,60,0.5);
+  margin-top: 1rem;
+  animation: glitch-anim-text 3s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-text {
+  0% { text-shadow: 3px 0 0 rgba(0,240,255,0.9), -3px 0 0 rgba(255,0,60,0.9); }
+  10% { text-shadow: -3px 0 0 rgba(0,240,255,0.9), 3px 0 0 rgba(255,0,60,0.9); }
+  11% { text-shadow: 3px 0 0 rgba(0,240,255,0.9), -3px 0 0 rgba(255,0,60,0.9); }
+  100% { text-shadow: 3px 0 0 rgba(0,240,255,0.9), -3px 0 0 rgba(255,0,60,0.9); }
+}
+
+[data-theme="cyberpunk"] .progress-bar-background { 
+  border-radius: 0; 
+  border: 4px solid #222; /* Industrial metal casing */
+  background: var(--bar-bg); 
+  height: 32px;
+  box-shadow: inset 0 0 10px #000, 0 8px 0 #111; /* Brutalist depth */
+  position: relative;
+  overflow: visible; /* To allow exposed pipes/wires if needed */
+}
+
+/* Exposed wire underneath the progress bar (Greebling) */
+[data-theme="cyberpunk"] .progress-wrapper {
+  position: relative;
+}
+[data-theme="cyberpunk"] .progress-wrapper::after {
+  content: "";
+  position: absolute;
+  bottom: -12px; left: 5%; right: 10%;
+  height: 3px;
+  background: #ff003c;
+  box-shadow: 0 0 5px #ff003c;
+  z-index: 10;
+}
+
+[data-theme="cyberpunk"] .progress-bar-fill { 
+  border-radius: 0; 
+  border-right: 4px solid #fff; /* Scavenged glowing hot lead edge */
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+  /* The fill itself is a cyan caution tape pattern defined in variables */
+}
+
+/* Utilitarian Data Readout */
+[data-theme="cyberpunk"] .percentage {
+  color: var(--text-main);
+  text-shadow: 0 0 8px rgba(252, 238, 10, 0.4);
+  font-weight: 700;
+}
+[data-theme="cyberpunk"] .details {
+  color: var(--text-muted);
+  text-shadow: 0 0 5px rgba(0, 240, 255, 0.4);
+}
+
+
+/* ========================================================================= */
+/* THEME: TERMINAL */
+/* ========================================================================= */
+[data-theme="terminal"] {
+  --font-base: 'Space Mono', monospace;
+  --bg-color: #000000; 
+  --text-main: #4ade80; /* Green 400 - high contrast 11:1 against black */
+  --text-muted: #22c55e; /* Green 500 */
+  --card-bg: transparent; 
+  --card-border: transparent; 
+  --card-shadow: none;
+  --bar-bg: #000; 
+  --bar-border: transparent;
+  --bar-fill: transparent;
+  --title-color: #4ade80;
+  --accent-color: #4ade80;
+  --selection-bg: rgba(74, 222, 128, 0.3);
+}
+
+[data-theme="terminal"] select { 
+  color: var(--text-main); 
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234ade80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); 
+}
+
+[data-theme="terminal"] { -webkit-font-smoothing: auto; } /* Crisp text in terminal */
+[data-theme="terminal"] #app { padding: 1rem; justify-content: space-between; }
+[data-theme="terminal"] .glass-card { padding: 1rem 0; border: none; background: transparent; backdrop-filter: none; }
+[data-theme="terminal"] select { background-color: #000; border: 1px solid #4ade80; border-radius: 0; font-weight: 400; }
+[data-theme="terminal"] h1 { text-align: left; font-size: clamp(1.5rem, 3vw, 2.5rem); margin-bottom: 2rem; font-weight: 700; }
+[data-theme="terminal"] h1::before { content: "root@system:~# "; color: var(--text-muted); }
+[data-theme="terminal"] .progress-wrapper { display: none; /* Hide graphical progress bar in terminal theme */ }
+[data-theme="terminal"] .stats { align-items: flex-start; gap: 1rem; }
+[data-theme="terminal"] .percentage { font-size: clamp(1.2rem, 2vw, 1.8rem); font-weight: 400; }
+[data-theme="terminal"] .details { font-size: 1rem; }
+[data-theme="terminal"] footer { text-align: left; border-top: 1px dashed var(--text-muted); padding-top: 1rem; margin-top: 3rem; }
+
+[data-theme="terminal"] .percentage-wrapper { align-items: baseline; }
+[data-theme="terminal"] #term-prefix, [data-theme="terminal"] #term-cursor { color: var(--text-muted); }
+[data-theme="terminal"] #term-cursor { animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Focus outlines for WCAG */
+:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 4px;
+}
