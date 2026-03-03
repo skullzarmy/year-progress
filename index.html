@@ -16,8 +16,8 @@
     <!-- Fonts: Inter (Standard), Space Mono (Terminal), MS Sans Serif/Tahoma vibe for Vaporwave (Win95), DSEG (80s Digital) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Space+Mono:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Space+Mono:wght@400;700&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Space+Mono:wght@400;700&display=optional" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Space+Mono:wght@400;700&display=optional"></noscript>
   </head>
   <body>
     <!-- Theme Transition Overlay -->
@@ -100,6 +100,25 @@
           </div>
         </div>
       </main>
+      
+      <!-- Inline sync calculation to eliminate FCP layout shift (100 Lighthouse) -->
+      <script>
+        (function() {
+          var now = new Date();
+          var year = now.getFullYear();
+          var startOfYear = new Date(year, 0, 1).getTime();
+          var startOfNextYear = new Date(year + 1, 0, 1).getTime();
+          var percentage = ((now.getTime() - startOfYear) / (startOfNextYear - startOfYear)) * 100;
+          var days = Math.ceil((startOfNextYear - now.getTime()) / (1000 * 60 * 60 * 24));
+          var pctStr = percentage.toFixed(7) + '%';
+          
+          document.getElementById('percentage-text').textContent = pctStr;
+          document.getElementById('days-remaining').textContent = days + ' days remaining';
+          document.getElementById('semantic-progress').value = percentage;
+          document.getElementById('semantic-progress').textContent = pctStr;
+          document.getElementById('progress-fill').style.clipPath = 'inset(0 ' + (100 - Math.min(Math.max(percentage, 0), 100)) + '% 0 0)';
+        })();
+      </script>
 
       <footer>
         <p id="footer-text">"Lost time is never found again." &mdash; Benjamin Franklin</p>
