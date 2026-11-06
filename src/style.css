@@ -156,7 +156,7 @@ html, body {
   position: relative; z-index: 10;
 }
 
-header { display: flex; justify-content: flex-end; z-index: 20; position: relative; margin-bottom: 2rem; }
+header { display: flex; justify-content: flex-end; align-items: center; gap: 0.75rem; z-index: 20; position: relative; margin-bottom: 2rem; }
 
 /* select styles */
 select {
@@ -837,3 +837,37 @@ footer a:hover {
   outline: 2px solid var(--accent-color);
   outline-offset: 4px;
 }
+
+
+/* ========================================================================= */
+/* Buttons + Share dialog                                                    */
+/* ========================================================================= */
+.ui-btn {
+  background-color: var(--card-bg); color: var(--text-main);
+  border: 1px solid var(--card-border); border-radius: 8px;
+  padding: 0.6rem 1rem; font-family: inherit; font-size: 0.95rem; font-weight: 500; cursor: pointer;
+  backdrop-filter: var(--card-backdrop); -webkit-backdrop-filter: var(--card-backdrop);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: all 0.2s ease;
+}
+.ui-btn:hover:not(:disabled) { border-color: var(--accent-color); }
+.ui-btn:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+.ui-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+[data-theme="vaporwave"] .ui-btn { background: #c0c0c0; border: 2px outset #fff; border-radius: 0; color: #000; }
+[data-theme="cyberpunk"] .ui-btn { border-radius: 0; background: #111116; }
+[data-theme="80s-digital"] .ui-btn { background: #0a0000; }
+[data-theme="terminal"] .ui-btn { background: #000; border-radius: 0; font-weight: 400; }
+
+#share-dialog {
+  margin: auto; border: 1px solid var(--card-border); border-radius: 16px; padding: 0;
+  background: var(--bg-color); color: var(--text-main);
+  width: min(92vw, 760px); max-height: 92vh; overflow: auto;
+}
+#share-dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
+[data-theme="vaporwave"] #share-dialog, [data-theme="cyberpunk"] #share-dialog, [data-theme="terminal"] #share-dialog { border-radius: 0; }
+.share-panel { padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+.share-panel h2 { margin: 0; font-size: 1.25rem; }
+.share-preview { aspect-ratio: 1200 / 630; display: grid; place-items: center; background: var(--bar-bg); border-radius: 8px; overflow: hidden; }
+.share-preview img { width: 100%; height: auto; display: block; }
+.share-status { margin: 0; color: var(--text-muted); }
+.share-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; }
+.share-message { margin: 0; min-height: 1.4em; font-size: 0.9rem; color: var(--text-muted); }

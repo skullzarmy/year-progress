@@ -9,8 +9,23 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "typescript": "~5.9.3",
-    "vite": "^7.3.1",
-    "vite-plugin-pwa": "^1.2.0"
+    "@netlify/edge-functions": "^4.0.4",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.6",
+    "vite-plugin-pwa": "^2.0.0"
+  },
+  "overrides": {
+    "@babel/core": "7.29.13",
+    "baseline-browser-mapping": "2.11.35",
+    "browserslist": "4.29.5",
+    "fast-uri": "3.1.9",
+    "glob": "14.0.4",
+    "minimatch": "11.0.5",
+    "brace-expansion": "5.0.12",
+    "picomatch": "4.0.7"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2"
   }
 }
