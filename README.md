@@ -14,7 +14,7 @@ Features multiple dynamic themes including Glassmorphism, Vaporwave, 80s Digital
   - `cyberpunk`: Brutalist UI, warning tape, and neon lights.
   - `terminal`: Pure green-on-black monospace matrix vibe.
 - **Micro-interactions**: Seamless overlay animations when switching between themes.
-- **Share**: the Share button renders a snapshot card of the current theme and progress in your browser, then lets you copy it, download it, or (where supported) use the native share sheet.
+- **Share**: the Share button renders a snapshot card of the current theme and progress in your browser, then lets you copy it, download it, use the native share sheet (where supported), or open post-intent links for X, Bluesky, Facebook, LinkedIn, Reddit, WhatsApp, Telegram and email. Intent links carry text + URL; the preview image comes from the theme-aware OG image.
 - **Dynamic Open Graph image**: `/og.png?theme=<theme>` is generated on demand with the live percentage and days remaining (Netlify Function, see below).
 - **Lightweight stack**: Vanilla UI powered by Vite and TypeScript, with no heavy frontend frameworks.
 

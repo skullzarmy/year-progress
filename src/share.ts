@@ -54,6 +54,26 @@ function fileName() {
   return `year-progress-${currentYear}-${currentTheme}.png`;
 }
 
+/** Post-intent links. They carry text + URL only; the preview image comes from the page's og:image. */
+function updateSocialLinks(percentage: number, daysRemaining: number) {
+  const url = `${location.origin}/?theme=${currentTheme}`;
+  const text = `${currentYear} is ${percentage.toFixed(2)}% complete \u2014 ${daysRemaining} days left.`;
+  const u = encodeURIComponent(url);
+  const t = encodeURIComponent(text);
+  const both = encodeURIComponent(`${text} ${url}`);
+  const links: Record<string, string> = {
+    'share-x': `https://twitter.com/intent/tweet?text=${t}&url=${u}`,
+    'share-bluesky': `https://bsky.app/intent/compose?text=${both}`,
+    'share-facebook': `https://www.facebook.com/sharer/sharer.php?u=${u}`,
+    'share-linkedin': `https://www.linkedin.com/sharing/share-offsite/?url=${u}`,
+    'share-reddit': `https://www.reddit.com/submit?url=${u}&title=${t}`,
+    'share-whatsapp': `https://wa.me/?text=${both}`,
+    'share-telegram': `https://t.me/share/url?url=${u}&text=${t}`,
+    'share-email': `mailto:?subject=${encodeURIComponent('Year Progress')}&body=${both}`,
+  };
+  for (const [id, href] of Object.entries(links)) $<HTMLAnchorElement>(id).href = href;
+}
+
 async function open() {
   const attr = document.documentElement.getAttribute('data-theme');
   currentTheme = isTheme(attr) ? attr : 'glassmorphism';
@@ -69,6 +89,7 @@ async function open() {
     // Calculated at the moment of sharing, so the image is an exact snapshot.
     const progress = calculateProgress();
     currentYear = progress.year;
+    updateSocialLinks(progress.percentage, progress.daysRemaining);
     const blob = await renderPng(buildCardSvg({ theme: currentTheme, progress, decimals: 7 }));
     if (currentUrl) URL.revokeObjectURL(currentUrl);
     currentBlob = blob;
