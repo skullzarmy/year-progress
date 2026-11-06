@@ -160,41 +160,6 @@
       </footer>
     </div>
     
-    <!-- Share dialog: preview of the generated image with copy / download actions -->
-    <dialog id="share-dialog" aria-labelledby="share-title">
-      <form method="dialog" class="share-panel">
-        <div class="share-head">
-          <h2 id="share-title">Share your progress</h2>
-          <button type="submit" class="ui-btn share-close" aria-label="Close">&times;</button>
-        </div>
-        <div class="share-preview" aria-live="polite">
-          <img id="share-image" alt="Year progress card" width="1200" height="630" hidden />
-          <p id="share-status" class="share-status">Rendering…</p>
-        </div>
-        <section class="share-section" aria-labelledby="share-save-label">
-          <h3 id="share-save-label">Save image</h3>
-          <div class="share-grid">
-            <button type="button" id="share-copy" class="ui-btn" disabled>Copy image</button>
-            <button type="button" id="share-download" class="ui-btn" disabled>Download</button>
-            <button type="button" id="share-native" class="ui-btn" hidden disabled>Share…</button>
-          </div>
-        </section>
-        <section class="share-section" aria-labelledby="share-post-label">
-          <h3 id="share-post-label">Post to</h3>
-          <nav class="share-grid" aria-label="Post to social networks">
-          <a class="ui-btn" id="share-x" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fyip.joepeterson.work%2F" target="_blank" rel="noopener noreferrer">X</a>
-          <a class="ui-btn" id="share-bluesky" href="https://bsky.app/intent/compose?text=https%3A%2F%2Fyip.joepeterson.work%2F" target="_blank" rel="noopener noreferrer">Bluesky</a>
-          <a class="ui-btn" id="share-facebook" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fyip.joepeterson.work%2F" target="_blank" rel="noopener noreferrer">Facebook</a>
-          <a class="ui-btn" id="share-linkedin" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fyip.joepeterson.work%2F" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-          <a class="ui-btn" id="share-reddit" href="https://www.reddit.com/submit?url=https%3A%2F%2Fyip.joepeterson.work%2F" target="_blank" rel="noopener noreferrer">Reddit</a>
-          <a class="ui-btn" id="share-whatsapp" href="https://wa.me/?text=https%3A%2F%2Fyip.joepeterson.work%2F" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-          <a class="ui-btn" id="share-telegram" href="https://t.me/share/url?url=https%3A%2F%2Fyip.joepeterson.work%2F" target="_blank" rel="noopener noreferrer">Telegram</a>
-          <a class="ui-btn" id="share-email" href="mailto:?subject=Year%20Progress&body=https%3A%2F%2Fyip.joepeterson.work%2F">Email</a>
-        </nav>
-        </section>
-        <p id="share-message" class="share-message" role="status"></p>
-      </form>
-    </dialog>
 
     <script type="module" src="/src/main.ts"></script>
   </body>
