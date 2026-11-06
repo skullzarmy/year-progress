@@ -840,7 +840,7 @@ footer a:hover {
 
 
 /* ========================================================================= */
-/* Buttons + Share dialog                                                    */
+/* Buttons + Share dialog — every theme gets its own take on the UI          */
 /* ========================================================================= */
 .ui-btn {
   --btn-line: color-mix(in srgb, var(--text-main) 40%, transparent);
@@ -850,33 +850,19 @@ footer a:hover {
   cursor: pointer; text-align: center; text-decoration: none;
   display: inline-flex; align-items: center; justify-content: center;
   backdrop-filter: var(--card-backdrop); -webkit-backdrop-filter: var(--card-backdrop);
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 .ui-btn:hover:not(:disabled) { border-color: var(--accent-color); }
 .ui-btn:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
 .ui-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-[data-theme="vaporwave"] .ui-btn { background: #c0c0c0; border: 2px outset #fff; border-radius: 0; color: #000; }
-[data-theme="cyberpunk"] .ui-btn, [data-theme="terminal"] .ui-btn { border-radius: 0; }
-[data-theme="cyberpunk"] .ui-btn { --btn-line: #ff003c; background: #111116; }
-[data-theme="80s-digital"] .ui-btn { background: #0a0000; }
-[data-theme="terminal"] .ui-btn { background: #000; font-weight: 400; }
 
-/* Dialog: opaque, bordered panel in every theme */
+/* Shared dialog structure */
 #share-dialog {
-  --dlg-bg: var(--bg-color); --dlg-line: var(--btn-line, var(--accent-color));
   margin: auto; padding: 0; width: min(94vw, 720px); max-height: 94vh; overflow: auto;
-  background: var(--dlg-bg); color: var(--text-main);
-  border: 2px solid var(--dlg-line); border-radius: 16px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+  background: var(--bg-color); color: var(--text-main);
+  border: 2px solid var(--accent-color); border-radius: 16px;
 }
-#share-dialog::backdrop { background: rgba(0, 0, 0, 0.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-[data-theme="glassmorphism"] #share-dialog { --dlg-bg: #ffffff; --dlg-line: rgba(0, 0, 0, 0.12); }
-[data-theme="vaporwave"] #share-dialog { --dlg-bg: #c0c0c0; --dlg-line: #000080; border-radius: 0; }
-[data-theme="80s-digital"] #share-dialog { --dlg-bg: #0a0000; --dlg-line: #ff3333; border-radius: 8px; }
-[data-theme="cyberpunk"] #share-dialog { --dlg-bg: #111116; --dlg-line: #ff003c; border-radius: 0; }
-[data-theme="terminal"] #share-dialog { --dlg-bg: #000; --dlg-line: #4ade80; border-radius: 0; }
-
-.share-panel { padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
+.share-panel { position: relative; padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; }
 .share-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .share-head h2 { margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--text-main); text-align: left; }
 .share-head h2::before { content: none; }
@@ -886,12 +872,136 @@ footer a:hover {
   background: color-mix(in srgb, var(--text-main) 8%, transparent);
   border: 1px solid color-mix(in srgb, var(--text-main) 25%, transparent); border-radius: 8px;
 }
-[data-theme="vaporwave"] .share-preview, [data-theme="cyberpunk"] .share-preview, [data-theme="terminal"] .share-preview { border-radius: 0; }
 .share-preview img { width: 100%; height: auto; display: block; }
 .share-status { margin: 0; color: var(--text-muted); }
 .share-section { display: flex; flex-direction: column; gap: 0.6rem; }
 .share-section h3 { margin: 0; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
 .share-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.5rem; }
 .share-message { margin: 0; min-height: 1.4em; font-size: 0.9rem; color: var(--text-muted); }
-/* The 80s theme's segment display font is unreadable for UI controls */
-[data-theme="80s-digital"] #share-dialog, [data-theme="80s-digital"] #share-dialog .ui-btn { font-family: 'Space Mono', monospace; }
+
+/* ---------- GLASSMORPHISM: frosted panel, pill buttons ---------- */
+[data-theme="glassmorphism"] #share-dialog::backdrop {
+  background: linear-gradient(135deg, rgba(79,172,254,0.55), rgba(255,8,68,0.4) 60%, rgba(255,234,0,0.45));
+  backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+[data-theme="glassmorphism"] #share-dialog {
+  background: rgba(255,255,255,0.93); border: 1px solid rgba(255,255,255,0.9); border-radius: 32px;
+  backdrop-filter: blur(32px) saturate(150%); -webkit-backdrop-filter: blur(32px) saturate(150%);
+  box-shadow: 0 30px 70px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.9);
+}
+[data-theme="glassmorphism"] .share-preview { border-radius: 20px; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+[data-theme="glassmorphism"] .ui-btn { border-radius: 999px; background: rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.9); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+[data-theme="glassmorphism"] .ui-btn:hover:not(:disabled) { background: rgba(255,255,255,0.85); box-shadow: 0 6px 16px rgba(0,0,0,0.14); }
+[data-theme="glassmorphism"] .share-section h3 { color: #1e293b; }
+
+/* ---------- VAPORWAVE: a Windows 95 window ---------- */
+[data-theme="vaporwave"] #share-dialog::backdrop {
+  background: linear-gradient(#000033, #660066 45%, #ff3399 85%); opacity: 0.88;
+}
+[data-theme="vaporwave"] #share-dialog {
+  background: #c0c0c0; border: 2px solid; border-color: #fff #404040 #404040 #fff; border-radius: 0;
+  box-shadow: 1px 1px 0 #000, 6px 6px 0 rgba(0,0,0,0.45); font-family: 'Tahoma', 'MS Sans Serif', Arial, sans-serif;
+}
+[data-theme="vaporwave"] .share-panel { padding: 3px; gap: 12px; }
+[data-theme="vaporwave"] .share-head {
+  background: linear-gradient(90deg, #000080, #1084d0); padding: 3px 4px 3px 8px; margin: 0;
+}
+[data-theme="vaporwave"] .share-head h2 { color: #fff; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+[data-theme="vaporwave"] .share-head h2::before { content: "SHARE.EXE — "; }
+[data-theme="vaporwave"] .share-close { width: 22px; height: 20px; font-size: 1rem; font-weight: 700; }
+[data-theme="vaporwave"] .share-preview, [data-theme="vaporwave"] .share-section, [data-theme="vaporwave"] .share-message { margin-left: 9px; margin-right: 9px; }
+[data-theme="vaporwave"] .share-preview { border-radius: 0; background: #fff; border: 2px solid; border-color: #808080 #fff #fff #808080; }
+[data-theme="vaporwave"] .share-section {
+  position: relative; border: 2px groove #fff; padding: 14px 8px 8px; margin-top: 4px;
+}
+[data-theme="vaporwave"] .share-section h3 {
+  position: absolute; top: -0.65em; left: 8px; background: #c0c0c0; padding: 0 4px; color: #000; font-size: 0.8rem; font-weight: 400; letter-spacing: 0; text-transform: none;
+}
+[data-theme="vaporwave"] .share-message { color: #000; padding-bottom: 6px; }
+[data-theme="vaporwave"] .ui-btn {
+  background: #c0c0c0; color: #000; border: 2px solid; border-color: #fff #404040 #404040 #fff; border-radius: 0;
+  box-shadow: 1px 1px 0 #000; font-family: inherit; font-size: 0.85rem; padding: 0.4rem 0.8rem; backdrop-filter: none;
+}
+[data-theme="vaporwave"] .ui-btn:active:not(:disabled) { border-color: #404040 #fff #fff #404040; box-shadow: none; padding: calc(0.4rem + 1px) calc(0.8rem - 1px) calc(0.4rem - 1px) calc(0.8rem + 1px); }
+[data-theme="vaporwave"] .ui-btn:hover:not(:disabled) { border-color: #fff #404040 #404040 #fff; }
+[data-theme="vaporwave"] .ui-btn:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
+[data-theme="vaporwave"] .share-close { padding: 0; }
+
+/* ---------- 80s DIGITAL: red LED glow, segment display type ---------- */
+[data-theme="80s-digital"] #share-dialog::backdrop {
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.9) 0 3px, rgba(30,0,0,0.9) 3px 4px);
+}
+[data-theme="80s-digital"] #share-dialog {
+  background: #0a0000; border: 2px solid #ff3333; border-radius: 8px; color: #ff3333;
+  box-shadow: 0 0 30px rgba(255,0,0,0.55), inset 0 0 30px rgba(255,0,0,0.18);
+  background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.35) 0 1px, transparent 1px 4px);
+}
+[data-theme="80s-digital"] .share-head h2, [data-theme="80s-digital"] .share-section h3 {
+  font-family: 'DSEG14 Classic', monospace; text-transform: uppercase; color: #ff3333;
+  text-shadow: 0 0 12px rgba(255,0,0,0.9); letter-spacing: 0.08em;
+}
+[data-theme="80s-digital"] .share-head h2 { font-size: 1.05rem; font-weight: 400; }
+[data-theme="80s-digital"] .share-section h3 { font-size: 0.7rem; font-weight: 400; color: #c73a3a; }
+[data-theme="80s-digital"] .share-preview { border: 2px solid #330000; border-radius: 4px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 0 18px rgba(255,0,0,0.3); }
+[data-theme="80s-digital"] .ui-btn {
+  font-family: 'DSEG14 Classic', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+  background: #0a0000; color: #ff3333; border: 1px solid #ff3333; border-radius: 3px; text-shadow: 0 0 8px rgba(255,0,0,0.9);
+  box-shadow: 0 0 10px rgba(255,0,0,0.35), inset 0 0 8px rgba(255,0,0,0.15);
+}
+[data-theme="80s-digital"] .ui-btn:hover:not(:disabled), [data-theme="80s-digital"] .ui-btn:focus-visible {
+  background: #ff3333; color: #0a0000; text-shadow: none; box-shadow: 0 0 22px rgba(255,0,0,0.9);
+}
+[data-theme="80s-digital"] .share-message { color: #e04444; font-family: 'Space Mono', monospace; text-shadow: 0 0 8px rgba(255,0,0,0.6); }
+[data-theme="80s-digital"] .share-close { font-family: 'Space Mono', monospace; text-shadow: none; }
+
+/* ---------- CYBERPUNK: hazard tape, chamfered corners, glitch ---------- */
+[data-theme="cyberpunk"] #share-dialog::backdrop {
+  background: radial-gradient(circle at 50% 40%, rgba(255,0,60,0.18), rgba(2,2,5,0.92) 70%), repeating-linear-gradient(0deg, rgba(0,240,255,0.06) 0 1px, transparent 1px 3px);
+}
+[data-theme="cyberpunk"] #share-dialog {
+  background: #111116; border: 3px solid #ff003c; border-radius: 0; overflow: auto;
+  clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 28px 100%, 0 calc(100% - 28px));
+}
+[data-theme="cyberpunk"] .share-panel { padding-top: 2.1rem; }
+[data-theme="cyberpunk"] .share-panel::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 14px;
+  background: repeating-linear-gradient(45deg, #fcee0a 0 12px, #050505 12px 24px);
+}
+[data-theme="cyberpunk"] .share-head h2 {
+  color: #fcee0a; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 800;
+  text-shadow: 2px 0 #00f0ff, -2px 0 #ff003c;
+}
+[data-theme="cyberpunk"] .share-head h2::before { content: "// "; color: #00f0ff; text-shadow: none; }
+[data-theme="cyberpunk"] .share-section h3 { color: #00f0ff; letter-spacing: 0.2em; }
+[data-theme="cyberpunk"] .share-section h3::before { content: "// "; color: #ff003c; }
+[data-theme="cyberpunk"] .share-preview { border: 2px solid #00f0ff; border-radius: 0; box-shadow: 6px 6px 0 rgba(255,0,60,0.45); }
+[data-theme="cyberpunk"] .ui-btn {
+  background: #050505; color: #fcee0a; border: 2px solid #ff003c; border-radius: 0; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; font-weight: 700;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+[data-theme="cyberpunk"] .ui-btn:hover:not(:disabled), [data-theme="cyberpunk"] .ui-btn:focus-visible { background: #fcee0a; color: #050505; border-color: #fcee0a; outline: none; }
+[data-theme="cyberpunk"] .share-close { background: #ff003c; color: #fff; }
+[data-theme="cyberpunk"] .share-message { color: #00f0ff; }
+
+/* ---------- TERMINAL: a shell session ---------- */
+[data-theme="terminal"] #share-dialog::backdrop { background: rgba(0,0,0,0.9); }
+[data-theme="terminal"] #share-dialog { background: #000; border: 1px solid #22c55e; border-radius: 0; box-shadow: none; font-family: 'Space Mono', monospace; }
+[data-theme="terminal"] .share-head { border-bottom: 1px dashed #22c55e; padding-bottom: 0.75rem; }
+[data-theme="terminal"] .share-head h2 { font-weight: 400; font-size: 1rem; color: #4ade80; }
+[data-theme="terminal"] .share-head h2::before { content: "user@year-progress:~$ "; color: #22c55e; }
+[data-theme="terminal"] .share-head h2::after { content: "█"; margin-left: 0.2em; animation: blink-overlay 1s step-end infinite; }
+[data-theme="terminal"] .share-section h3 { text-transform: none; letter-spacing: 0; font-size: 0.85rem; font-weight: 400; color: #22c55e; }
+[data-theme="terminal"] .share-section h3::before { content: "# "; }
+[data-theme="terminal"] .share-preview { border: 1px dashed #22c55e; border-radius: 0; }
+[data-theme="terminal"] .share-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.25rem 0.5rem; }
+[data-theme="terminal"] .ui-btn {
+  background: transparent; border: 0; border-radius: 0; color: #4ade80; font-weight: 400; padding: 0.35rem 0.25rem; justify-content: flex-start; backdrop-filter: none;
+}
+[data-theme="terminal"] .ui-btn::before { content: "[ "; white-space: pre; color: #22c55e; }
+[data-theme="terminal"] .ui-btn::after { content: " ]"; white-space: pre; color: #22c55e; }
+[data-theme="terminal"] .ui-btn:hover:not(:disabled), [data-theme="terminal"] .ui-btn:focus-visible { background: #4ade80; color: #000; outline: none; }
+[data-theme="terminal"] .ui-btn:hover:not(:disabled)::before, [data-theme="terminal"] .ui-btn:hover:not(:disabled)::after,
+[data-theme="terminal"] .ui-btn:focus-visible::before, [data-theme="terminal"] .ui-btn:focus-visible::after { color: #000; }
+[data-theme="terminal"] .share-close { width: auto; height: auto; font-size: 0.95rem; }
+[data-theme="terminal"] .share-message { color: #22c55e; }
+[data-theme="terminal"] .share-message:not(:empty)::before { content: "> "; }
