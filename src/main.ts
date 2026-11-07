@@ -38,7 +38,11 @@ function getInitialTheme(): string {
 let currentTheme = getInitialTheme();
 
 function setTheme(theme: string) {
-  document.documentElement.setAttribute('data-theme', theme);
+  // The head script already applied the initial theme; re-writing the same
+  // attribute would still invalidate style for the whole document.
+  if (document.documentElement.getAttribute('data-theme') !== theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
   themeSelect.value = theme;
   localStorage.setItem(THEME_KEY, theme);
   currentTheme = theme;
