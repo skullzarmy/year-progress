@@ -14,6 +14,8 @@ Features multiple dynamic themes including Glassmorphism, Vaporwave, 80s Digital
   - `cyberpunk`: Brutalist UI, warning tape, and neon lights.
   - `terminal`: Pure green-on-black monospace matrix vibe.
 - **Micro-interactions**: Seamless overlay animations when switching between themes.
+- **Share**: the Share button renders a snapshot card of the current theme and progress in your browser, then lets you copy it, download it, use the native share sheet (where supported), or open post-intent links for X, Bluesky, Facebook, LinkedIn, Reddit, WhatsApp, Telegram and email. Intent links carry text + URL; the preview image comes from the theme-aware OG image.
+- **Dynamic Open Graph image**: `/og.png?theme=<theme>` is generated on demand with the live percentage and days remaining (Netlify Function, see below).
 - **Lightweight stack**: Vanilla UI powered by Vite and TypeScript, with no heavy frontend frameworks.
 
 ## Getting Started
@@ -45,6 +47,14 @@ bun run build
 ```
 
 The optimized output will be available in the `dist` directory, ready to be deployed to any static host like Netlify, Vercel, or GitHub Pages.
+
+## Dynamic OG image (Netlify)
+
+`netlify/functions/og.mts` serves `/og.png`, rendering the same SVG card used by the share dialog (`src/lib/card.ts`) to PNG with [resvg](https://github.com/yisibl/resvg-js) and the fonts in `netlify/functions/fonts`. Query params: `theme` (one of the five themes) and optionally `at` (ISO timestamp, to render a specific moment). `netlify/edge-functions/og-meta.ts` rewrites the `og:image` tag so `/?theme=cyberpunk` previews with the cyberpunk card. Run locally with `netlify dev`.
+
+## Security maintenance
+
+Run `bun audit` to check for advisories. Transitive fixes that upstream (`workbox-build`) hasn't picked up yet are pinned via `overrides` in `package.json`.
 
 ## License
 

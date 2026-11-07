@@ -1,3 +1,31 @@
+/* Self-hosted (OFL) — same-origin, preloaded Inter avoids the Google Fonts connection + CSS->font chain and late relayout. */
+@font-face {
+  font-family: 'Inter';
+  src: url('./fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: optional;
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+@font-face {
+  font-family: 'Space Mono';
+  src: url('./fonts/space-mono-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: optional;
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+@font-face {
+  font-family: 'Space Mono';
+  src: url('./fonts/space-mono-latin-700-normal.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: optional;
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
 @font-face {
   font-family: 'DSEG7 Classic';
   src: url('./fonts/DSEG7Classic-Regular.woff2') format('woff2');
@@ -156,7 +184,7 @@ html, body {
   position: relative; z-index: 10;
 }
 
-header { display: flex; justify-content: flex-end; z-index: 20; position: relative; margin-bottom: 2rem; }
+header { display: flex; justify-content: flex-end; align-items: center; gap: 0.75rem; z-index: 20; position: relative; margin-bottom: 2rem; }
 
 /* select styles */
 select {
@@ -837,3 +865,48 @@ footer a:hover {
   outline: 2px solid var(--accent-color);
   outline-offset: 4px;
 }
+
+/* Buttons (shared by the header Share button and the lazy-loaded share dialog) */
+.ui-btn {
+  --btn-line: color-mix(in srgb, var(--text-main) 40%, transparent);
+  background-color: var(--card-bg); color: var(--text-main);
+  border: 1px solid var(--btn-line); border-radius: 8px;
+  padding: 0.6rem 1rem; font-family: inherit; font-size: 0.95rem; font-weight: 500; line-height: 1.2;
+  cursor: pointer; text-align: center; text-decoration: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  backdrop-filter: var(--card-backdrop); -webkit-backdrop-filter: var(--card-backdrop);
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+.ui-btn:hover:not(:disabled) { border-color: var(--accent-color); }
+.ui-btn:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+.ui-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+[data-theme="glassmorphism"] .ui-btn { border-radius: 999px; background: rgba(255,255,255,0.5); border-color: rgba(255,255,255,0.9); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+[data-theme="glassmorphism"] .ui-btn:hover:not(:disabled) { background: rgba(255,255,255,0.85); box-shadow: 0 6px 16px rgba(0,0,0,0.14); }
+[data-theme="vaporwave"] .ui-btn {
+  background: #c0c0c0; color: #000; border: 2px solid; border-color: #fff #404040 #404040 #fff; border-radius: 0;
+  box-shadow: 1px 1px 0 #000; font-family: inherit; font-size: 0.85rem; padding: 0.4rem 0.8rem; backdrop-filter: none;
+}
+[data-theme="vaporwave"] .ui-btn:active:not(:disabled) { border-color: #404040 #fff #fff #404040; box-shadow: none; padding: calc(0.4rem + 1px) calc(0.8rem - 1px) calc(0.4rem - 1px) calc(0.8rem + 1px); }
+[data-theme="vaporwave"] .ui-btn:hover:not(:disabled) { border-color: #fff #404040 #404040 #fff; }
+[data-theme="vaporwave"] .ui-btn:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
+[data-theme="80s-digital"] .ui-btn {
+  font-family: 'DSEG14 Classic', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+  background: #0a0000; color: #ff3333; border: 1px solid #ff3333; border-radius: 3px; text-shadow: 0 0 8px rgba(255,0,0,0.9);
+  box-shadow: 0 0 10px rgba(255,0,0,0.35), inset 0 0 8px rgba(255,0,0,0.15);
+}
+[data-theme="80s-digital"] .ui-btn:hover:not(:disabled), [data-theme="80s-digital"] .ui-btn:focus-visible {
+  background: #ff3333; color: #0a0000; text-shadow: none; box-shadow: 0 0 22px rgba(255,0,0,0.9);
+}
+[data-theme="cyberpunk"] .ui-btn {
+  background: #050505; color: #fcee0a; border: 2px solid #ff003c; border-radius: 0; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.8rem; font-weight: 700;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+[data-theme="cyberpunk"] .ui-btn:hover:not(:disabled), [data-theme="cyberpunk"] .ui-btn:focus-visible { background: #fcee0a; color: #050505; border-color: #fcee0a; outline: none; }
+[data-theme="terminal"] .ui-btn {
+  background: transparent; border: 0; border-radius: 0; color: #4ade80; font-weight: 400; padding: 0.35rem 0.25rem; justify-content: flex-start; backdrop-filter: none;
+}
+[data-theme="terminal"] .ui-btn::before { content: "[ "; white-space: pre; color: #22c55e; }
+[data-theme="terminal"] .ui-btn::after { content: " ]"; white-space: pre; color: #22c55e; }
+[data-theme="terminal"] .ui-btn:hover:not(:disabled), [data-theme="terminal"] .ui-btn:focus-visible { background: #4ade80; color: #000; outline: none; }
+[data-theme="terminal"] .ui-btn:hover:not(:disabled)::before, [data-theme="terminal"] .ui-btn:hover:not(:disabled)::after,
+[data-theme="terminal"] .ui-btn:focus-visible::before, [data-theme="terminal"] .ui-btn:focus-visible::after { color: #000; }

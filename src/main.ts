@@ -1,4 +1,6 @@
 import './style.css';
+import './share.ts';
+import { calculateProgress } from './lib/progress.ts';
 
 // DOM Elements
 const themeSelect = document.getElementById('theme-select') as HTMLSelectElement;
@@ -36,7 +38,11 @@ function getInitialTheme(): string {
 let currentTheme = getInitialTheme();
 
 function setTheme(theme: string) {
-  document.documentElement.setAttribute('data-theme', theme);
+  // The head script already applied the initial theme; re-writing the same
+  // attribute would still invalidate style for the whole document.
+  if (document.documentElement.getAttribute('data-theme') !== theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
   themeSelect.value = theme;
   localStorage.setItem(THEME_KEY, theme);
   currentTheme = theme;
@@ -118,24 +124,6 @@ themeSelect.addEventListener('change', async (e) => {
     setTheme(targetTheme);
   }
 });
-
-// Progress Calculation
-function calculateProgress() {
-  const now = new Date();
-  const year = now.getFullYear();
-  
-  const startOfYear = new Date(year, 0, 1).getTime();
-  const startOfNextYear = new Date(year + 1, 0, 1).getTime();
-  
-  const totalMs = startOfNextYear - startOfYear;
-  const elapsedMs = now.getTime() - startOfYear;
-  const remainingMs = totalMs - elapsedMs;
-  
-  const percentage = (elapsedMs / totalMs) * 100;
-  const daysRemaining = Math.ceil(remainingMs / (1000 * 60 * 60 * 24));
-  
-  return { percentage, daysRemaining };
-}
 
 let lastTickTime = 0;
 
